@@ -27,7 +27,11 @@
 #define VTHROT_MAX 2700
 #define VTHROT_MIN 1270
 #define VREF 3300.
-#define ADC_MAX 4095
+#define ADC_MAX 4095.
+#define ADC_RATIO (ADC_MAX/VREF)
+
+#define VIN_MIN (ADC_RATIO * VTHROT_MIN)
+#define VIN_MAX (ADC_RATIO * VTHROT_MAX)
 
 //#define CAN_TWO_WAY 1
 void serial_put(char *str)
@@ -116,17 +120,13 @@ void adc_stm_loop(void)
 		uint16_t adc_value = 0;
 		if (adcerr = read_adc(&adc_value), adcerr == 0) {
 			for (volatile unsigned int i = 0; i < 5000; i++);
-			if (adc_value < VTHROT_MIN) adc_value = VTHROT_MIN;
+			if (adc_value < VIN_MIN) 
+                adc_value = VIN_MIN;
 
-			adc_value = (adc_value - 500)/2750.*4096.;
-
-			if (adc_value > 4070) adc_value = 4095;
+			adc_value = (adc_value - VIN_MIN)/2750.*4096.;
 
 			my_data.data[0] = (adc_value) & 0xFF;
 			my_data.data[1] = (adc_value >> 8);
-
-			if (my_data.msgnum % 30) my_data.baseid = 0x200;
-			else my_data.baseid = 0x201;
 
 			encrypt_can_packet(&packet, &my_data);
 			send_can_packet(&packet);

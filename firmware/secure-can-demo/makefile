@@ -30,7 +30,7 @@
 
 # Target file name (without extension).
 # This is the base name of the compiled .hex file.
-TARGET = secure-can
+TARGET = master/master
 #TARGET = simpleserial-can
 # List C source files here.
 # Header files (.h) are automatically pulled in.
@@ -57,6 +57,7 @@ endif
 
 ifeq ($(ISMASTER), NO)
 #echo "Making ADC Can"
+TARGET = throttle/throttle
 CFLAGS += -DSTM_ADC
 endif
 
