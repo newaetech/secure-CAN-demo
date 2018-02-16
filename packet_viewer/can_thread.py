@@ -1,45 +1,65 @@
 import threading
-import PCANBasic as pcan
+
 import sys
 import time
 import os
 
+if sys.platform.startswith("linux"): #assume rpi
+    import can
+    #sys.exit() #not ready yet
+elif sys.platform.startswith('win'): #assume pcan
+    import PCANBasic as pcan
+else:
+    print "System not supported (x86 win or rpi linux only)"
+    sys.exit()
 import secure_can as seccan
-        
-class can_thread(threading.Thread):
-    """ Implementation of serial running in a thread.
-    This will run a thread when the start method is called
-    
-    Inheriets the threading class.
-    """
-    def __init__(self, rxcallback):
-        threading.Thread.__init__(self)
-        self.__quit = False
-        self.__canbus = pcan.PCAN_USBBUS1
-        self.__caniface = pcan.PCANBasic()
-        self.__connected = False
-        self.__rxcallback = rxcallback
 
-    #disconnects from pcan
+class pican_wrapper():
+    def __init__(self):
+    #init and connect in same step?
+        self.__connected = False
+        pass
+    def disconnect(self):
+        #can't disconnect?
+        pass
+    def connect(self, listenonly = True):
+        try:
+            self.__canbus = can.interface.Bus(channel = 'can0', bustype = 'socketcan_ctypes')
+        except:
+            return -1
+        self.__connected = True
+        return 0
+    def write(self, addr, data):
+        pass
+    def read(self):
+        ret = self.__canbus.recv()
+        if ret:
+            return [0, ret.arbitration_id, ret.data]
+        else:
+            return [-1, 0]
+
+class pcan_wrapper():
+    def __init__(self):
+        self.__canbus = pcan.PCAN_USBBUS1
+        self.__caniface = pcan.PCANBasic() #for now
+        self.__connected = False
+        
     def disconnect(self):
         self.__caniface.Uninitialize(self.__canbus)
-
-    #connects to pcan in listen only mode
+        
     def connect(self, listenonly = True):
         self.__caniface.Uninitialize(self.__canbus)
         if listenonly:
-			self.__caniface.SetValue(self.__canbus, pcan.PCAN_LISTEN_ONLY, pcan.PCAN_PARAMETER_ON)
-			
+            self.__caniface.SetValue(self.__canbus, pcan.PCAN_LISTEN_ONLY, pcan.PCAN_PARAMETER_ON)
+            
         result = self.__caniface.Initialize(self.__canbus, pcan.PCAN_BAUD_250K, pcan.PCAN_USB)
         if result == pcan.PCAN_ERROR_OK:
-            print "Connected great" 
             self.__connected = True
+            return 0
         else:
-            print "Connection did not work " + str(hex(result)) 
-        return self.__connected
-
-    #writes data over can bus with ext_id or base_id address
-    def write(self, address, data):
+            return result
+            
+    def write(self, addr, data):
         if len(data) > 8:
             return False
 
@@ -53,29 +73,54 @@ class can_thread(threading.Thread):
             msg.MSGTYPE = pcan.PCAN_MESSAGE_EXTENDED
         else:
             msg.MSGTYPE = pcan.PCAN_MESSAGE_STANDARD
+            
+        self.__caniface.Write(self.__canbus, msg)
+        
+    #[addr, message]
+    def read(self):
+        packet = self.__caniface.Read(self.__canbus)
+        if packet[0] == pcan.PCAN_ERROR_OK:
+            return [0, packet[1].ID, list(packet[1].DATA)[0:packet[1].LEN]]
+        else:
+            return [-1, 0]
+    
+        
+class can_thread(threading.Thread):
+    """ Implementation of serial running in a thread.
+    This will run a thread when the start method is called
+    
+    Inheriets the threading class.
+    """
+    def __init__(self, rxcallback):
+        threading.Thread.__init__(self)
+        self.__quit = False
+        self.__can = pcan_wrapper()
+        self.__connected = False
+        self.__rxcallback = rxcallback
 
-        try:
-            for x in range(0, len(data)):
-                msg.DATA[x] = data[x] 
-            print "Sending ID = " + str(hex(msg.ID)) 
-            print "Length = " + str(msg.LEN)
-            for x in range(0, msg.LEN):
-                sys.stdout.write(str(hex(msg.DATA[x])) + " ")
-            self.__caniface.Write(self.__canbus, msg) 
-        except:
-            print "Unexpected error:", sys.exc_info()[0]            
-        pass
-		
+    #disconnects from pcan
+    def disconnect(self):
+        self.__can.disconnect()
+
+    #connects to pcan in listen only mode
+    def connect(self, listenonly = True):
+        return self.__can.connect(listenonly)
+
+    #writes data over can bus with ext_id or base_id address
+    def write(self, address, data):
+        write(address, data)
+        
     def quit(self):
         self.__quit = True
+        
     def run(self):
         while not self.__quit:
-            ret = self.__caniface.Read(self.__canbus)
-            if ret[0] == pcan.PCAN_ERROR_OK:
-                self.__rxcallback(ret[1].ID, list(ret[1].DATA)[0:ret[1].LEN] )
+            ret = self.__can.read()
+            if ret[0] == 0:
+                self.__rxcallback(ret[1], ret[2])
         print "Can thread exiting.."
-		
-	
+        
+    
 
 class test_can():
     """ Implementation of serial running in a thread.
@@ -114,7 +159,7 @@ class test_can():
         os.write(1, 'RX FROM CAN\n-----------\nID = ' + str(hex(id_parts[0])) + '\nCnt = ' + str(hex(id_parts[1])) + '\n')
 #voltage = ((decrypt_data[0][1] << 8) | decrypt_data[0][0]) / 4096.0 * 3.3
         pedal = ((decrypt_data[0][1] << 8) | decrypt_data[0][0]) / 40.95
-		#pedal = ((decrypt_data[0][1] << 8) | decrypt_data[0][0]) / 40.96
+        #pedal = ((decrypt_data[0][1] << 8) | decrypt_data[0][0]) / 40.96
         os.write(1, 'Pedal % = {}'.format(pedal) + '\nDecrypted = {}\n'.format(decrypt_data[1]))
         pass
 

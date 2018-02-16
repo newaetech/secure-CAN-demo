@@ -1,12 +1,13 @@
 import sys
 from PySide import QtGui, QtCore
-import test_can as mycan
+from can_thread import can_thread
+import can_thread as mycan
 import secure_can as seccan
 
 class test_can_gui(QtGui.QWidget):
 	def __init__(self):
 		super(test_can_gui, self).__init__()
-		self.can = mycan.can_thread(self.rxcallback)
+		self.can = can_thread(self.rxcallback)
 		self.seccan = seccan.secure_can()
 		self.can.start()
 		
