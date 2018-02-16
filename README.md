@@ -39,11 +39,11 @@ In addition to the above adapters, you'll also need a splitter to split the CAN 
   This project uses the same build system as [Chipwhisperer](www.google.ca). By default, this project builds for the master device and STM32F3 hardware. New firmware can be built in firmware/secure-can-demo using the following command:
   ``` make ISMASTER=NO ```
   
-* Upload the throttle firmware (firmware/secure-can-demo/throttle.hex) to your throttle device
+* Upload the throttle firmware (firmware/secure-can-demo/throttle/throttle-CW308_STM32F3.hex) to your throttle device
   * Uploading firmware can be done through a debugger or through a CWLite
   * Uploading instructions for the STM32F3 are described [here](www.google.ca)
   
-* Upload the master firmware (firmware/secure-can-demo/master.hex) to your master device
+* Upload the master firmware (firmware/secure-can-demo/master/master-CW308_STM32F3.hex) to your master device
 
 ### CPA Attack Details
 * The algorithm to encrypt and authenticate are shown [here](www.google.ca)

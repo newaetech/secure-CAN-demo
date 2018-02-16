@@ -24,8 +24,10 @@
 #include <string.h>
 #include "aes-independant.h"
 
+//2.4 max
 #define VTHROT_MAX 2700
 #define VTHROT_MIN 1270
+//1.27 min
 #define VREF 3300.
 #define ADC_MAX 4095.
 #define ADC_RATIO (ADC_MAX/VREF)
@@ -122,6 +124,9 @@ void adc_stm_loop(void)
 			for (volatile unsigned int i = 0; i < 5000; i++);
 			if (adc_value < VIN_MIN) 
                 adc_value = VIN_MIN;
+            
+            if (adc_value > VIN_MAX) 
+                adc_value = VIN_MAX;
 
 			adc_value = (adc_value - VIN_MIN)/2750.*4096.;
 

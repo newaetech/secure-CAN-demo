@@ -21,7 +21,8 @@ class pican_wrapper():
         self.__connected = False
         pass
     def disconnect(self):
-        #can't disconnect?
+        self.__connected = False
+        return 0
         pass
     def connect(self, listenonly = True):
         self.__connected = True
@@ -29,7 +30,7 @@ class pican_wrapper():
     def write(self, addr, data):
         pass
     def read(self):
-        if self.__canbus == None:
+        if self.__connected == False
             return [-1, 0]
         ret = self.__canbus.recv()
         if ret != None:
