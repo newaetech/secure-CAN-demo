@@ -17,24 +17,23 @@ import secure_can as seccan
 class pican_wrapper():
     def __init__(self):
     #init and connect in same step?
+        self.__canbus = can.interface.Bus(channel = 'can0', bustype = 'socketcan_ctypes')
         self.__connected = False
         pass
     def disconnect(self):
         #can't disconnect?
         pass
     def connect(self, listenonly = True):
-        try:
-            self.__canbus = can.interface.Bus(channel = 'can0', bustype = 'socketcan_ctypes')
-        except:
-            return -1
         self.__connected = True
         return 0
     def write(self, addr, data):
         pass
     def read(self):
+        if self.__canbus == None:
+            return [-1, 0]
         ret = self.__canbus.recv()
-        if ret:
-            return [0, ret.arbitration_id, ret.data]
+        if ret != None:
+            return [0, ret.arbitration_id, list(ret.data)[0:ret.dlc]]
         else:
             return [-1, 0]
 
@@ -94,7 +93,11 @@ class can_thread(threading.Thread):
     def __init__(self, rxcallback):
         threading.Thread.__init__(self)
         self.__quit = False
-        self.__can = pcan_wrapper()
+        if sys.platform.startswith("linux"): #assume rpi
+            self.__can = pican_wrapper()
+            #sys.exit() #not ready yet
+        elif sys.platform.startswith("win"): #assume pcan
+            self.__can = pcan_wrapper()
         self.__connected = False
         self.__rxcallback = rxcallback
 

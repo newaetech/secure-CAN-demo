@@ -9,7 +9,6 @@ class test_can_gui(QtGui.QWidget):
 		super(test_can_gui, self).__init__()
 		self.can = can_thread(self.rxcallback)
 		self.seccan = seccan.secure_can()
-		self.can.start()
 		
 		self.num_rows = 1
 		self.is_connected = False
@@ -125,6 +124,7 @@ class test_can_gui(QtGui.QWidget):
 		
 		self.setGeometry(300, 300, 500, 400)
 		self.setWindowTitle('Can Viewer - Disconnected')
+		self.can.start()
 		self.show()
 		
 def main():
