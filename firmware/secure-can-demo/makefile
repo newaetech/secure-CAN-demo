@@ -59,6 +59,7 @@ ifeq ($(ISMASTER), NO)
 #echo "Making ADC Can"
 TARGET = throttle/throttle
 CFLAGS += -DSTM_ADC
+OPT = 0
 endif
 
 ifeq ($(CRYPTO_TARGET),)

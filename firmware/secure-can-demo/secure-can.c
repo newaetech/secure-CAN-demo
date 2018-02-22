@@ -25,15 +25,15 @@
 #include "aes-independant.h"
 
 //2.4 max
-#define VTHROT_MAX 2700
-#define VTHROT_MIN 1270
+#define VTHROT_MAX 2800
+#define VTHROT_MIN 500
 //1.27 min
 #define VREF 3300.
-#define ADC_MAX 4095.
-#define ADC_RATIO (ADC_MAX/VREF)
+#define ADC_TOP 4095.
+#define ADC_RATIO (ADC_TOP/VREF)
 
-#define VIN_MIN (ADC_RATIO * VTHROT_MIN)
-#define VIN_MAX (ADC_RATIO * VTHROT_MAX)
+#define ADC_MIN (ADC_RATIO * VTHROT_MIN)
+#define ADC_MAX (ADC_RATIO * VTHROT_MAX)
 
 //#define CAN_TWO_WAY 1
 void serial_put(char *str)
@@ -110,7 +110,7 @@ void adc_stm_loop(void)
 {
 	int adcerr;
 	can_input my_data = {
-				.msgnum = 0x3FF00,
+				.msgnum = 0x0,
 				.baseid = 0x200,
 				.data = {0x12, 0x34, 0x56, 0x78}
 	};
@@ -122,13 +122,15 @@ void adc_stm_loop(void)
 		uint16_t adc_value = 0;
 		if (adcerr = read_adc(&adc_value), adcerr == 0) {
 			for (volatile unsigned int i = 0; i < 5000; i++);
-			if (adc_value < VIN_MIN) 
-                adc_value = VIN_MIN;
+			if (adc_value < ADC_MIN) 
+                adc_value = ADC_MIN;
             
-            if (adc_value > VIN_MAX) 
-                adc_value = VIN_MAX;
+            if (adc_value > ADC_MAX) 
+                adc_value = ADC_MAX;
 
-			adc_value = (adc_value - VIN_MIN)/2750.*4096.;
+			adc_value = (adc_value - ADC_MIN)/2750.*4096.;
+            if (adc_value > 4095)
+                adc_value = 4095;
 
 			my_data.data[0] = (adc_value) & 0xFF;
 			my_data.data[1] = (adc_value >> 8);
