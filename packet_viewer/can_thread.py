@@ -21,12 +21,11 @@ class pican_wrapper():
         self.__connected = False
         pass
     def disconnect(self):
-        self.__connected = False
+        #self.__connected = False
         return 0
-        pass
     def connect(self, listenonly = True):
         self.__connected = True
-        return 0
+        return True
     def write(self, addr, data):
         pass
     def read(self):

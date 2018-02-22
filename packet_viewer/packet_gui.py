@@ -10,6 +10,7 @@ class test_can_gui(QtGui.QWidget):
                 self.can = can_thread(self.rxcallback)
                 self.seccan = seccan.secure_can()
 
+                self.is_started = False
                 self.num_rows = 1
                 self.is_connected = False
                 self.max_rows = 20
@@ -32,7 +33,7 @@ class test_can_gui(QtGui.QWidget):
                 if decrypt_data[1]:
                     pedal_str = "{:3.2f}%".format(pedal)
                 else:
-                    "N/A"
+                    pedal_str = "N/A"
                 data_str = ""
                 for i in data:
                         data_str += " 0x{:02X} ".format(i)
@@ -59,7 +60,7 @@ class test_can_gui(QtGui.QWidget):
                                         self._table.setItem(rows, columns, self._table.takeItem(rows + 1, columns))
                                 self._table.setItem(start, columns, endcpy[columns])
 
-                if (decrypt_data[1]):
+                if decrypt_data[1]:
                         update_table(0)
                 elif self.num_rows < self.max_rows:
                         update_table(self.num_rows)
@@ -75,13 +76,14 @@ class test_can_gui(QtGui.QWidget):
                 event.accept()
 
         def connect(self):
+                if not self.is_started:
+                        self.is_started = True
+                        self.can.start()
                 if self.can.connect():
-                        self.is_connected = True
-                        self.setWindowTitle('Can Viewer - Connected')
-
                         self.conbut.setText("Disconnect")
                         self.conbut.setToolTip('Disconnects from can bus')
                         self.conbut.clicked.connect(self.disconnect)
+                        self.is_connected = True
                 else:
                         self.conbut.setText("Connect (error)")
 
@@ -138,7 +140,6 @@ class test_can_gui(QtGui.QWidget):
 
                 #self.setGeometry(300, 300, 500, 400)
                 self.setWindowTitle('Can Viewer - Disconnected')
-                self.can.start()
                 self.showFullScreen()
 
 def main():
