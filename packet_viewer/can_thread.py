@@ -30,7 +30,7 @@ class pican_wrapper():
     def write(self, addr, data):
         pass
     def read(self):
-        if self.__connected == False
+        if self.__connected == False:
             return [-1, 0]
         ret = self.__canbus.recv()
         if ret != None:
@@ -55,9 +55,13 @@ class pcan_wrapper():
         result = self.__caniface.Initialize(self.__canbus, pcan.PCAN_BAUD_250K, pcan.PCAN_USB)
         if result == pcan.PCAN_ERROR_OK:
             self.__connected = True
-            return 0
+            return True
         else:
-            return result
+            self.print_err("Connect", result)
+            return False
+
+    def print_err(self, errstr, error):
+        print errstr + ": " + self.__caniface.GetErrorText(error)[1]
             
     def write(self, addr, data):
         if len(data) > 8:
