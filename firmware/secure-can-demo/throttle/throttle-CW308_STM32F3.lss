@@ -1070,7 +1070,7 @@ void adc_stm_loop(void)
  8000c82:	2b00      	cmp	r3, #0
  8000c84:	d002      	beq.n	8000c8c <adc_stm_loop+0x5c>
                 adc_value = ADC_MIN;
- 8000c86:	f44f 731b 	mov.w	r3, #620	; 0x26c
+ 8000c86:	f44f 7318 	mov.w	r3, #608	; 0x260
  8000c8a:	817b      	strh	r3, [r7, #10]
             
             if (adc_value > ADC_MAX) 
@@ -1084,10 +1084,10 @@ void adc_stm_loop(void)
  8000ca0:	2b00      	cmp	r3, #0
  8000ca2:	d002      	beq.n	8000caa <adc_stm_loop+0x7a>
                 adc_value = ADC_MAX;
- 8000ca4:	f640 5392 	movw	r3, #3474	; 0xd92
+ 8000ca4:	f640 5317 	movw	r3, #3351	; 0xd17
  8000ca8:	817b      	strh	r3, [r7, #10]
 
-			adc_value = (adc_value - ADC_MIN)/2750.*4096.;
+			adc_value = (adc_value - ADC_MIN)*ADC_TOP/(ADC_MAX - ADC_MIN);
  8000caa:	897b      	ldrh	r3, [r7, #10]
  8000cac:	4618      	mov	r0, r3
  8000cae:	f7ff fbdd 	bl	800046c <__aeabi_i2d>
@@ -1098,16 +1098,16 @@ void adc_stm_loop(void)
  8000cbe:	460c      	mov	r4, r1
  8000cc0:	4618      	mov	r0, r3
  8000cc2:	4621      	mov	r1, r4
- 8000cc4:	a322      	add	r3, pc, #136	; (adr r3, 8000d50 <adc_stm_loop+0x120>)
- 8000cc6:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8000cca:	f7ff fd63 	bl	8000794 <__aeabi_ddiv>
+ 8000cc4:	f04f 0200 	mov.w	r2, #0
+ 8000cc8:	4b24      	ldr	r3, [pc, #144]	; (8000d5c <adc_stm_loop+0x12c>)
+ 8000cca:	f7ff fc39 	bl	8000540 <__aeabi_dmul>
  8000cce:	4603      	mov	r3, r0
  8000cd0:	460c      	mov	r4, r1
  8000cd2:	4618      	mov	r0, r3
  8000cd4:	4621      	mov	r1, r4
- 8000cd6:	f04f 0200 	mov.w	r2, #0
- 8000cda:	4b20      	ldr	r3, [pc, #128]	; (8000d5c <adc_stm_loop+0x12c>)
- 8000cdc:	f7ff fc30 	bl	8000540 <__aeabi_dmul>
+ 8000cd6:	a31e      	add	r3, pc, #120	; (adr r3, 8000d50 <adc_stm_loop+0x120>)
+ 8000cd8:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8000cdc:	f7ff fd5a 	bl	8000794 <__aeabi_ddiv>
  8000ce0:	4603      	mov	r3, r0
  8000ce2:	460c      	mov	r4, r1
  8000ce4:	4618      	mov	r0, r3
@@ -1157,12 +1157,12 @@ void adc_stm_loop(void)
 	while(1) {
  8000d3c:	e781      	b.n	8000c42 <adc_stm_loop+0x12>
  8000d3e:	bf00      	nop
- 8000d40:	e8ba2e8c 	.word	0xe8ba2e8c
- 8000d44:	408363a2 	.word	0x408363a2
- 8000d48:	45d1745d 	.word	0x45d1745d
- 8000d4c:	40ab2517 	.word	0x40ab2517
- 8000d50:	00000000 	.word	0x00000000
- 8000d54:	40a57c00 	.word	0x40a57c00
+ 8000d40:	3018d302 	.word	0x3018d302
+ 8000d44:	4083018d 	.word	0x4083018d
+ 8000d48:	a2e8ba2f 	.word	0xa2e8ba2f
+ 8000d4c:	40aa2e8b 	.word	0x40aa2e8b
+ 8000d50:	56e2856e 	.word	0x56e2856e
+ 8000d54:	40a56e28 	.word	0x40a56e28
  8000d58:	08005aec 	.word	0x08005aec
  8000d5c:	40b00000 	.word	0x40b00000
 

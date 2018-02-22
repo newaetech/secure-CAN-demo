@@ -25,11 +25,11 @@
 #include "aes-independant.h"
 
 //2.4 max
-#define VTHROT_MAX 2800
-#define VTHROT_MIN 500
+#define VTHROT_MAX 2700
+#define VTHROT_MIN 490
 //1.27 min
 #define VREF 3300.
-#define ADC_TOP 4095.
+#define ADC_TOP 4096.
 #define ADC_RATIO (ADC_TOP/VREF)
 
 #define ADC_MIN (ADC_RATIO * VTHROT_MIN)
@@ -128,7 +128,7 @@ void adc_stm_loop(void)
             if (adc_value > ADC_MAX) 
                 adc_value = ADC_MAX;
 
-			adc_value = (adc_value - ADC_MIN)/2750.*4096.;
+			adc_value = (adc_value - ADC_MIN)*ADC_TOP/(ADC_MAX - ADC_MIN);
             if (adc_value > 4095)
                 adc_value = 4095;
 
