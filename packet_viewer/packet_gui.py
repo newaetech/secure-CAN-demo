@@ -139,6 +139,7 @@ class test_can_gui(QtGui.QWidget):
                 self.setLayout(vlayout)
 
                 #self.setGeometry(300, 300, 500, 400)
+                self.connect()
                 self.setWindowTitle('Can Viewer - Disconnected')
                 self.showFullScreen()
 
