@@ -5759,8 +5759,8 @@ int init_adc(void)
 	}
 
 	ADC_ChannelConfTypeDef channel;
-	channel.Channel = ADC_CHANNEL_4; //PB14
- 8002dee:	2304      	movs	r3, #4
+	channel.Channel = ADC_CHANNEL_5; //PB15
+ 8002dee:	2305      	movs	r3, #5
  8002df0:	60fb      	str	r3, [r7, #12]
 	channel.Rank = ADC_REGULAR_RANK_1; //single conversion, does this matter?
  8002df2:	2301      	movs	r3, #1

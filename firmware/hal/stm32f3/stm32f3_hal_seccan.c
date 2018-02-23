@@ -227,7 +227,7 @@ int init_adc(void)
 	}
 
 	ADC_ChannelConfTypeDef channel;
-	channel.Channel = ADC_CHANNEL_4; //PB14
+	channel.Channel = ADC_CHANNEL_5; //PB15
 	channel.Rank = ADC_REGULAR_RANK_1; //single conversion, does this matter?
 	channel.SamplingTime = ADC_SAMPLETIME_19CYCLES_5;
 	channel.SingleDiff = ADC_SINGLE_ENDED;

@@ -10,6 +10,7 @@ This demo was created to showcase Correlation Power Analysis (CPA) attacks on CA
 * 2 CANoodlers
 * Something to perform CPA attacks with (CW Lite, CW Pro, etc)
 * A USB/CAN adapter to insert CAN packets
+* Something to split the CAN bus off for the USB/CAN adapter
 * Something that outputs an analog voltage level (must output no higher than 3.3V. The adjustable regulator on the CW308 boards will work fine for this)
 * Something to view a PWM output (the LEDs on the CW308 boards will work)
 
@@ -26,11 +27,13 @@ In addition to the above adapters, you'll also need a splitter to split the CAN 
 * Attach CANoodlers to each other
 * Turn termination to on on both CANoodlers
   * Note that there should be exactly two terminations on the CAN bus. If you have another device on the bus, make sure it's not terminated
-* Connect your analog voltage source (3.3V max) to PB14/MISO pin on one CW308. This will be your throttle device
+* Connect your analog voltage source (3.3V max) to PB15/MOSI pin on one CW308. This will be your throttle device
   * If you're using the adjustable regulator on the CW308, switch VADJ SRC to 3.3V
   * The VADJ output is on the pin right next to the VADJ potentiometer.
 * Connect your PWM viewing device to PA11/GPIO3 on the other CW308. This will be your master device
   * If you want to use the CW308 LEDS for this, connect PA11/GPIO3 to LED 1, 2, or 3
+* Use the aplitter to split the CAN bus off from the two CANoodlers
+* Attach the free end of the splitter to your USB/CAN adapter
 
 ### Firmware Setup
 * Depending on the voltage range of your voltage input, you may need to modify the firmware
