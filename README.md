@@ -1,16 +1,26 @@
 # Secure Can Demo
 
-This demo was created to showcase Correlation Power Analysis (CPA) attacks on CAN buses using AES for encryption and authentication.
+This demo was created to showcase Correlation Power Analysis (CPA) attacks on CAN buses using AES for encryption and authentication. This network was described in the paper "Power Analysis and Fault Attacks against Secure CAN: How Safe Are Your Keys?" by Colin O'Flynn and Greg d'Eon, published in SAE International Journal of Transportation Cybersecurity & Privacy.
+
+Because there are no good public standards for secure CAN (as of ~2017 when the article was written), this example network was created. This secure CAN network features the following specifications:
+
+ * Uses AES-128 for encryption & authentication of packets (based on AES-CCM mode).
+ * Works with standard CAN messages (does not need CAN-FD or higher-layer transport).
+ * Maximum data size of 4 bytes (as 4 additional bytes used for MAC tag to provide authentication).
+ * Separate Encryption & Authentication keys (differs from AES-CCM, this was done to slightly complicate the type of attack described in the paper 'IOT Goes Nuclear', which improves the CPA attack due to key reuse between the -CTR and -CBC operations in -CCM).
+ * Limited to standard CAN ID field, as the additional bytes of the Extended ID are used as a message counter (to prevent replay attacks).
+ 
+ Despite the excellent security, it is still trivial to break with a CPA attack. The use of AES-CCM means a slightly more complicated attack to break the AES-CTR mode, but remains possible. This repoistory holds the files required to build the example network.
 
 ## Getting Started
 
 ### Required Hardware
 * 2 CW308 Boards
-* 2 CW308 Target Boards with CAN headers (STM32F3 only, for now)
+* 2 CW308 Target Boards with CAN headers (STM32F3 only, for now but should work with STM32F4/STM32F4HWC with little effort)
 * 2 CANoodlers
 * Something to perform CPA attacks with (CW Lite, CW Pro, etc)
 * A USB/CAN adapter to insert CAN packets
-* Something to split the CAN bus off for the USB/CAN adapter
+* Something to split the CAN bus off for the USB/CAN adapter (can build 4-node CAN network as well)
 * Something that outputs an analog voltage level (must output no higher than 3.3V. The adjustable regulator on the CW308 boards will work fine for this)
 * Something to view a PWM output (the LEDs on the CW308 boards will work)
 
@@ -21,7 +31,6 @@ If you want to view the packets being sent over the CAN bus, this project includ
 In addition to the above adapters, you'll also need a splitter to split the CAN bus
 
 ### Hardware Setup
-[Detailed instructions including pictures](http://www.google.ca)
 * Attach target boards to CW308s
 * Attach target boards to CANoodlers
 * Attach CANoodlers to each other
@@ -51,7 +60,7 @@ In addition to the above adapters, you'll also need a splitter to split the CAN 
 * Upload the master firmware (firmware/secure-can-demo/master/master-CW308_STM32F3.hex) to your master device
 
 ### CPA Attack Details
-* The algorithm to encrypt and authenticate are shown [here](http://www.google.ca)
+* The attack will need the random CAN input data along with message ID (encoded into extended bits of CAN ID).
 * To aid in CPA attacks, the trigger pin is set high while running through AES. If you want to remove this, remove trigger_high() and trigger_low() from seccan.c encrypt and decrypt functions
 * The STM32F3s look for an external clock before falling back on the internal one. If you want to supply an external clock (say from a CWLite), this clock must be 8MHz.
 
